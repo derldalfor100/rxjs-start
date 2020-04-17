@@ -1,15 +1,5 @@
 import { Observable } from "rxjs/Observable";
-
-const observableLog = Observable.create((observer: any) => {
-    try {
-        observer.next('Hey guys!');
-        observer.next('How are you?');
-        observer.complete();
-        observer.next('This will not send');
-    } catch (err) {
-        observer.error(err);
-    }
-});
+import 'rxjs/add/operator/share';
 
 const observable = Observable.create((observer: any) => {
     try {
@@ -21,13 +11,7 @@ const observable = Observable.create((observer: any) => {
     } catch (err) {
         observer.error(err);
     }
-});
-
-observableLog.subscribe(
-    (x: any) => console.warn(x),
-    (error: any) => console.error(error),
-    () => console.info('Completed')
-);
+}).share();
 
 const observer = observable.subscribe(
     (x: any) => addItem(x),
@@ -35,15 +19,11 @@ const observer = observable.subscribe(
     () => addItem('Completed')
 );
 
-const observer2 = observable.subscribe(
-    (x: any) => addItem(x)
-);
-
-observer.add(observer2);
-
 setTimeout(() => {
-    observer.unsubscribe();
-}, 6001);
+    const observer2 = observable.subscribe(
+        (x: any) => addItem(`Subscriber2: ${x}`)
+    );
+}, 1000);
 
 function addItem(val: any) {
 
