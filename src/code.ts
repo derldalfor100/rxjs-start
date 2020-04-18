@@ -1,12 +1,24 @@
-import { from } from "rxjs/Observable/from";
-import 'rxjs/add/operator/pluck';
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
+import { interval } from "rxjs/Observable/interval";
+import 'rxjs/add/operator/skipUntil';
 
-from([
-    { first: 'Gary', last: 'Simon', age: '34' },
-    { first: 'Jane', last: 'Simon', age: '34' },
-    { first: 'John', last: 'Simon', age: '34' }
-]).pluck('first')
-    .subscribe((x: any) => addItem(x));
+const observable1 = Observable.create((data: any) => {
+    let i = 1;
+    setInterval(() => {
+        data.next(i++);
+    }, 1000);
+});
+
+const observable2 = new Subject();
+
+setTimeout(() => {
+    observable2.next('Hey!');
+}, 3000);
+
+const newObs = observable1.skipUntil(observable2);
+
+newObs.subscribe((x: any) => addItem(x));
 
 function addItem(val: any) {
 
